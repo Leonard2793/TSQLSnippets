@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Create QLAB/INTERFACE Synonym</Title>
+      <Shortcut>synqlab</Shortcut>
+      <Description>Creates a synonym in ext schema with different targets for QLAB (TEST) and INTERFACE (PROD)</Description>
+      <Author>Custom</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>SynonymName</ID>
+          <ToolTip>Name of the synonym (e.g., WMS_Stock)</ToolTip>
+          <Default>WMS_TableName</Default>
+        </Literal>
+        <Literal>
+          <ID>TableName</ID>
+          <ToolTip>Table name in both TEST and PROD (e.g., stock)</ToolTip>
+          <Default>TableName</Default>
+        </Literal>
+        <Literal>
+          <ID>TestServerName</ID>
+          <ToolTip>TEST server name for comparison</ToolTip>
+          <Default>w2695\MSS0368</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="SQL"><![CDATA[-- Drop synonym if it exists
+DROP SYNONYM IF EXISTS ext.$SynonymName$;
+
+-- Create synonym based on server environment
+IF @@SERVERNAME = '$TestServerName$'
+    -- for TEST environment
+    CREATE SYNONYM ext.$SynonymName$ FOR [QLAB].[test].[$TableName$];
+ELSE
+    -- for PROD environment
+    CREATE SYNONYM ext.$SynonymName$ FOR [INTERFACE].[wms].[$TableName$];
+
+GO
+$end$]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Create Synonym with Server Check</Title>
+      <Shortcut>synserver</Shortcut>
+      <Description>Creates a synonym with different targets for production and test servers</Description>
+      <Author>Custom</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>SynonymName</ID>
+          <ToolTip>Name of the synonym</ToolTip>
+          <Default>syn_TableName</Default>
+        </Literal>
+        <Literal>
+          <ID>ServerPattern</ID>
+          <ToolTip>Server name pattern for production (e.g., %PROD%)</ToolTip>
+          <Default>%PROD%</Default>
+        </Literal>
+        <Literal>
+          <ID>ProdTarget</ID>
+          <ToolTip>Production target (Server.Database.Schema.Object)</ToolTip>
+          <Default>[PROD-Server].[ProdDB].[dbo].[TableName]</Default>
+        </Literal>
+        <Literal>
+          <ID>TestTarget</ID>
+          <ToolTip>Test target (Server.Database.Schema.Object)</ToolTip>
+          <Default>[TEST-Server].[TestDB].[dbo].[TableName]</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="SQL"><![CDATA[-- Drop synonym if it exists
+DROP SYNONYM IF EXISTS $SynonymName$;
+
+-- Create synonym based on server environment
+IF @@SERVERNAME LIKE '$ServerPattern$'
+    CREATE SYNONYM $SynonymName$ FOR $ProdTarget$;
+ELSE
+    CREATE SYNONYM $SynonymName$ FOR $TestTarget$;
+
+GO
+$end$]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
